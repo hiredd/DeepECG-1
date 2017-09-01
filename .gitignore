@@ -1,0 +1,10 @@
+#files to ignore
+*.pyc
+*.pyo
+
+#directories to ignore
+#data/
+processed_data/
+logs/
+saved_models
+
