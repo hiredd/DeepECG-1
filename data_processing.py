@@ -381,9 +381,6 @@ class getData():
     self.X_train, self.X_test, self.Y_train, self.Y_test = inst.random_split(np.asarray(feat, dtype=np.float), np.asarray(labels, dtype=np.int32))
 
 class plotHelper():
-  def __init__(self):
-  
-  
   # prints and plots the confusion matrix
   def plot_confusion_matrix(cm, classes, title='Confusion matrix', cmap=plt.cm.Blues):
       print(cm)
@@ -422,7 +419,8 @@ class plotHelper():
       plt.ylabel('loss')
       plt.xlabel('epoch')
       plt.legend(['train', 'test'], loc='upper left')
-      plt.show()    
+      plt.show()   
+
 #call methods unless already called
 if(os.path.isfile(os.path.join('processed_data', 'filecgdata' + "." + 'csv')) 
 and os.path.isfile(os.path.join('processed_data', 'unfilecgdata' + "." + 'csv'))
