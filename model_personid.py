@@ -24,9 +24,10 @@ dataset.get()
 (X_train, Y_train), (X_test, Y_test) = (dataset.X_train, dataset.Y_train), (dataset.X_test, dataset.Y_test)
 
 # preprocess data
-X_train = X_train.reshape(X_train.shape[0], 1, 9077, 1)
-X_test = X_test.reshape(X_test.shape[0], 1, 9077, 1)
-
+X_train = X_train.reshape(X_train.shape[0], 1, 430, 1)
+X_test = X_test.reshape(X_test.shape[0], 1, 430, 1)
+print X_train.shape
+print X_test.shape
 
 # normalize data values to range [0, 1]
 X_train /= 255
@@ -40,10 +41,10 @@ Y_test = np_utils.to_categorical(Y_test, 90)
 
 #model architecture
 model = Sequential()
-model.add(Convolution2D(16, 1, 5, activation='tanh', input_shape=(1,9077,1), kernel_regularizer=regularizers.l2(0.01)))
+model.add(Convolution2D(32, 1, 5, activation='tanh', input_shape=(1,430,1), kernel_regularizer=regularizers.l2(0.001)))
 model.add(MaxPooling2D(pool_size=(1,3)))
 
-model.add(Convolution2D(32, 1, 5, activation='tanh', kernel_regularizer=regularizers.l2(0.01)))
+model.add(Convolution2D(64, 1, 5, activation='tanh', kernel_regularizer=regularizers.l2(0.001)))
 model.add(MaxPooling2D(pool_size=(1,3)))
 
 model.add(Flatten())
@@ -69,40 +70,24 @@ print('Test loss:', score[0])
 print('Test accuracy:', score[1])
 
 # save model to dir
-model.save_weights(os.path.join('saved_pid_w_m', 'rsampled_.h5'))
+model.save_weights(os.path.join('saved_models', 'rsampled_.h5'))
 
 # plot performance graph
-# summarise history for accuracy
-print(history.history.keys())
-plt.plot(history.history['acc'])
-plt.plot(history.history['val_acc'])
-plt.title('model accuracy')
-plt.ylabel('accuracy')
-plt.xlabel('epoch')
-plt.legend(['train', 'test'], loc='upper left')
-plt.show()
+plot_fn = data.plotHelper()
+plot_fn.plot_keys(history)
 
-# summarise history for loss
-plt.plot(history.history['loss'])
-plt.plot(history.history['val_loss'])
-plt.title('model loss')
-plt.ylabel('loss')
-plt.xlabel('epoch')
-plt.legend(['train', 'test'], loc='upper left')
-plt.show()
-
-    
-"""
 # confusion matrix
 y_pred = model.predict_classes(X_test)
 print(y_pred)
 
 p=model.predict_proba(X_test) # to predict probability
-names = np.arange(90) # throws error - needs fix
+
+inst = data.Setup()
+feats, personid, info = inst.get_data()
+names, age, gender = inst.dissect_labels(info)
 target_names = np.asarray(names)
 print(classification_report(np.argmax(Y_test,axis=1), y_pred,target_names=target_names))
 print(confusion_matrix(np.argmax(Y_test,axis=1), y_pred))
-"""
 
 # load model from dir
 # model = model.load_weights(os.path.join('saved_pid_w_m', 'rsampled_.h5'))

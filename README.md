@@ -23,36 +23,12 @@ files. Outputs the following files in the `processed_data/` folder:
 
 ##### [Note]: If the folder, `processed_data/`, does not exist in your working directory on your local machine, create it. You can either run data_processing.py to generate the .csv files mentioned above or download them from the links provided. 
 
-2. `python model_personid.py`: Run cnn model on training data. Evaluate model. 
+2. `python model_personid.py`: Train and evaluate model for person
+identification. See line 370 in `data_processing.py` on specific instructions
+for data setup.
 
-### Network
-
-Input shape: (6073, 9077)
-
-Layer 1: filters=16, shape=(1,5), activation='tanh'
-
-Layer 2: 2DMaxPooling(size=(1,3))
-
-Layer 3: filters=32, shape=(1,5), activation='tanh'
-
-Layer 4: 2DMaxPooling(size=(1,3))
-
-Flatten Layer 4.
-
-Layer 5: size=128, activation='tanh'
-
-Layer 6: size=90, activation='softmax'
-
-This is the layer that spits out probabilities for each of the 90 categories (persons).
-
-I used RMS Prop as an optimiser and Early Stopping as a regulariser with patience 10. 
-
-### Performance
-![graph](/images/performance_summary_graph.png?raw=true)
-
-Validation Accuracy: 91%
-
-Validation Loss: 0.546
+3. `python model_genderid.py`: Train and evaluate model for gender
+identification.
 
 ### Database
 

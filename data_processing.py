@@ -188,7 +188,7 @@ class Augmentation:
   
   #calls slice signal on consequitive pairs of max peaks
   def helper_slice(self, ndnp, personid, row, maxdist, maxarr, maxpos):
-    print row
+    #print row
     for curr_pos, next_pos in izip(maxpos, islice(maxpos,1,None)):
       self.slice_signal(ndnp, personid, row, maxdist, curr_pos, next_pos)
       
@@ -198,7 +198,10 @@ class Augmentation:
     mv = ndnp[row][:]
     step_back = stop-1
     chunk = mv[start:step_back]
-    rchunk = signal.resample(chunk, maxdist) #resample chunk
+    #normal heart rate: 50 to 140 beats per minute
+    #choose 70 as our typical beats per minute
+    #60/70 * 500 = 428.57 ~ 430
+    rchunk = signal.resample(chunk, 430) #resample chunk
     temp = np.asarray([personid])
     chunktab = np.concatenate((temp, rchunk), axis=0)
     self.gen_dataset(chunktab, personid, 'resampled')
@@ -223,7 +226,7 @@ class Augmentation:
       self.new_data = self.new_data.append(chunk_df, ignore_index=True)
       
     if flag is 'resampled':
-      print "in gen dataset"
+      #print "in gen dataset"
       self.rsampled_data = self.rsampled_data.append(chunk_df, ignore_index=True)
       
   #distance b/w two points
@@ -310,7 +313,7 @@ class Setup():
     data = pd.DataFrame(new_data)
     npdata = np.asarray(data, dtype=np.float32) #changed from 64 to 32
     personid = npdata[:,0] #strip labels
-    feats = npdata[:, np.r_[1:9078]] #strip features
+    feats = npdata[:, np.r_[1:431]] #strip features
     
     ecglabels = pd.read_csv(os.path.join('processed_data', 'ecgdblabels.csv'))
     pdlabels = pd.DataFrame(ecglabels)
@@ -346,36 +349,80 @@ class Setup():
         self.g_labels = np.append(self.g_labels, 0)
       if (gen == 'female'):
         self.g_labels = np.append(self.g_labels, 1)
-    return self.p_labels, self.a_labels, self.g_labels
+    return people, age, self.g_labels
 
 #gets data from Setup() in the form required
 class getData():
   def __init__(self):
     self.people_labels = self.age_labels = self.gender_labels = np.array([])
     self.x_train = self.y_train = self.x_test = self.y_test = np.array([])
-    self.p = self.a = self.g = np.array([])
     self.id_gender = [] #gender labels for new dataset
-    
+  
   def get(self):
     inst = Setup()
     feats, personid, info = inst.get_data()
     p, a, g = inst.dissect_labels(info)
     self.people_labels, self.age_labels, self.gender_labels = inst.labels_to_ints(p, a, g)
-    self.split_dataset(feats, personid)
-    
+    X, Y = self.gender_id(feats, personid)
+    return X, Y, p
+    #comment out line 368-369 for person identification
+    #uncomment the line below
+    #self.split_dataset(feats, personid)
+  
   def gender_id(self, feat, personid):
     for i, person in enumerate(personid):
       this = self.gender_labels[int(person)-1]
       self.id_gender.append(this) 
-    self.init_split(feat, self.id_gender)
-  
-  def init_split(self, feat, labels):
-    self.split_dataset(feat, labels)
+    return feat, np.asarray(self.id_gender, dtype=np.int32) #for k_fold
+    #self.split_dataset(feat, self.id_gender)
   
   def split_dataset(self, feat, labels):
     inst = Setup()
     self.X_train, self.X_test, self.Y_train, self.Y_test = inst.random_split(np.asarray(feat, dtype=np.float), np.asarray(labels, dtype=np.int32))
-    
+
+class plotHelper():
+  def __init__(self):
+  
+  
+  # prints and plots the confusion matrix
+  def plot_confusion_matrix(cm, classes, title='Confusion matrix', cmap=plt.cm.Blues):
+      print(cm)
+      plt.imshow(cm, interpolation='nearest', cmap=cmap)
+      plt.title(title)
+      plt.colorbar()
+      tick_marks = np.arange(len(classes))
+      plt.xticks(tick_marks, classes, rotation=45)
+      plt.yticks(tick_marks, classes)
+  
+      fmt = 'd'
+      thresh = cm.max() / 2.
+      for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
+          plt.text(j, i, format(cm[i, j], fmt),
+                   horizontalalignment="center",
+                   color="white" if cm[i, j] > thresh else "black")
+  
+      plt.tight_layout()
+      plt.ylabel('True label')
+      plt.xlabel('Predicted label')
+      plt.show()
+      
+  # summarise history for accuracy and loss graphically
+  def plot_keys(history):
+      print(history.history.keys())
+      plt.plot(history.history['acc'])
+      plt.plot(history.history['val_acc'])
+      plt.title('model accuracy')
+      plt.ylabel('accuracy')
+      plt.xlabel('epoch')
+      plt.legend(['train', 'test'], loc='upper left')
+      plt.show()
+      plt.plot(history.history['loss'])
+      plt.plot(history.history['val_loss'])
+      plt.title('model loss')
+      plt.ylabel('loss')
+      plt.xlabel('epoch')
+      plt.legend(['train', 'test'], loc='upper left')
+      plt.show()    
 #call methods unless already called
 if(os.path.isfile(os.path.join('processed_data', 'filecgdata' + "." + 'csv')) 
 and os.path.isfile(os.path.join('processed_data', 'unfilecgdata' + "." + 'csv'))
