@@ -3,21 +3,19 @@ Author: Aishni Parab
 File: model_genderid.py
 Description: calls functions in data_processing to init data. runs training and testing on data.
 """
-import os
-import numpy as np
-import pandas as pd
-import data_processing as data 
-import matplotlib.pyplot as plt
-
-from keras.models import Sequential, load_model
-from keras.layers import Dense
-from keras.wrappers.scikit_learn import KerasClassifier
-from sklearn.model_selection import cross_val_score, cross_val_predict, StratifiedKFold, learning_curve
+from sklearn.model_selection import cross_val_score, cross_val_predict, StratifiedKFold
 from sklearn.metrics import accuracy_score, classification_report,confusion_matrix
-from sklearn.preprocessing import LabelEncoder, StandardScaler
+from keras.wrappers.scikit_learn import KerasClassifier
+from keras.models import Sequential, load_model
+from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
-from sklearn.datasets import load_digits
-import itertools
+from keras.layers import Dense
+
+import matplotlib.pyplot as plt
+import data_processing as data 
+import pandas as pd
+import numpy as np
+import os
 
 # fix random seed for reproducibility
 seed = 7

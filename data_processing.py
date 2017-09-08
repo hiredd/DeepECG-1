@@ -3,16 +3,17 @@ Author: Aishni Parab
 File: data_processing.py
 Description: converts .dat files to .csv and generates an aggregated dataset.
 """
-
-import pandas as pd
-import numpy as np
-import wfdb
-import os, sys
-import math, urllib2
-from numpy import Inf
 from sklearn.model_selection import train_test_split
 from itertools import combinations, izip, islice
+import matplotlib.pyplot as plt
 from scipy import signal
+from numpy import Inf
+import pandas as pd
+import numpy as np
+import wfdb, math
+import itertools
+import os, sys
+
 
 #.dat to .csv converter
 class csvGenerator:

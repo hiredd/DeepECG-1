@@ -9,7 +9,6 @@ from keras.callbacks import EarlyStopping, TensorBoard
 from keras.models import Sequential, load_model
 from keras import optimizers, regularizers
 from keras.utils import np_utils
-import matplotlib.pyplot as plt
 
 import data_processing as data 
 import numpy as np
